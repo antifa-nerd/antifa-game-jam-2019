@@ -11,6 +11,8 @@ public class EnemyMovement : MonoBehaviour
 
     public float Speed = 10f;
 
+    public float RotationSpeed = 1f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,12 @@ public class EnemyMovement : MonoBehaviour
         var totalDistance = (endPosition - startPosition).magnitude;
 
         transform.position = Vector3.Lerp(startPosition, endPosition, distance / totalDistance);
+
+        var destUp = endPosition - transform.position;
+        if (transform.up != destUp)
+        {
+            transform.up = Vector3.Lerp(transform.up, destUp, RotationSpeed / (destUp - transform.up).magnitude);
+        }
 
         if (distance > totalDistance)
         {
