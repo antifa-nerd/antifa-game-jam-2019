@@ -159,6 +159,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Alerted: 0
   ResettingTime: 3
+  TriggerTime: 0.3
   Exclamation: {fileID: 422152894}
 --- !u!60 &324424426
 PolygonCollider2D:
