@@ -44,7 +44,7 @@ public class EnemySight : MonoBehaviour
 
     private IEnumerator ResetAlerted()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(ResettingTime);
         Alerted = false;
         Exclamation.SetActive(false);
         ResettingAlerted = null;
