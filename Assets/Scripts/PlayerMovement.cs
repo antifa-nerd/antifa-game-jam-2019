@@ -32,8 +32,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (isMoving){
             Vector3 movement = input;
-            
-            
+            rb.position+=(Vector2)movement.normalized*speed*Time.deltaTime;
+            /*
             if (movement.x!=0)
                 movement.x=Mathf.Sign(movement.x);
             if (movement.y!=0)
@@ -54,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
                     lastUpdate = 0f;
                 }
             }
-            
+            */
             
 
             
