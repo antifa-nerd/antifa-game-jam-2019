@@ -7,7 +7,6 @@ public class EnemyMovement : MonoBehaviour
     public GameObject[] Steps;
 
     private int currentStep = 0;
-    private float distance = 0;
 
     public float Speed = 10f;
 
@@ -33,15 +32,13 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         // get the current path we're following
-        var startStep = Steps[currentStep];
-        var endStep = Steps[(currentStep + 1) % Steps.Length];
-        var startPosition = startStep.transform.position;
-        var endPosition = endStep.transform.position;
+        var startPosition = transform.position;
+        var endPosition = Steps[currentStep].transform.position;
 
         // move along the path
-        distance += Speed * Time.deltaTime;
+        var delta = Speed * Time.deltaTime;
         var totalDistance = (endPosition - startPosition).magnitude;
-        transform.position = Vector3.Lerp(startPosition, endPosition, distance / totalDistance);
+        transform.position = Vector3.Lerp(startPosition, endPosition, delta / totalDistance);
 
         // rotate according to the direction
         var destUp = endPosition - transform.position;
@@ -51,9 +48,8 @@ public class EnemyMovement : MonoBehaviour
         }
 
         // move to the next path part if completed it
-        if (distance > totalDistance)
+        if (delta > totalDistance)
         {
-            distance = totalDistance - distance;
             currentStep = (currentStep + 1) % Steps.Length;
         }
     }
