@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
+using System;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -42,10 +43,13 @@ public class EnemyMovement : MonoBehaviour
 
     public void OnPathComplete(Path p)
     {
+        if (p.error)
+        {
+            throw new Exception(p.errorLog);
+        }
         Path = p;
         ComputingPath = false;
         currentWaypoint = 0;
-        Debug.Log("Yay, we got a path back. Did it have an error? " + p.error);
     }
 
     // Update is called once per frame
@@ -89,14 +93,9 @@ public class EnemyMovement : MonoBehaviour
 
         // rotate according to the direction
         var destUp = (endPosition - transform.position).normalized;
-        if ((transform.up - destUp).sqrMagnitude > 0.1f)
+        if (transform.up != destUp)
         {
-            var newUp = Vector3.Lerp(transform.up, destUp, RotationSpeed * Time.deltaTime / (destUp - transform.up).magnitude);
-            if (transform.up != newUp)
-            {
-                Debug.Log(string.Format("{2}: Changing up from {0} to {1}", transform.up, newUp, Time.time));
-            }
-            transform.up = newUp;
+            transform.up = Vector3.Lerp(transform.up, destUp, RotationSpeed * Time.deltaTime / (destUp - transform.up).magnitude);
         }
     }
 }
