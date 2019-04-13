@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding;
 using System;
+using System.Linq;
 
 public class EnemyMovement : MonoBehaviour
 {
     public GameObject[] Steps;
 
-    private int currentStep = 0;
+    private int currentStepIndex = 0;
 
-    private int currentWaypoint = 0;
+    private int currentWaypointIndex = 0;
 
     public float Speed = 10f;
 
@@ -18,23 +19,75 @@ public class EnemyMovement : MonoBehaviour
 
     private Seeker Seeker;
 
+    private EnemySight EnemySight;
+
+    private GameObject Player;
+
     // Start is called before the first frame update
     void Start()
     {
-        this.GetComponentInChildren<EnemySight>().OnAlertedChanged += AlertedChanged;
+        EnemySight = this.GetComponentInChildren<EnemySight>();
         Seeker = GetComponent<Seeker>();
+        Player = GameObject.FindGameObjectWithTag("Player");
+
+        EnemySight.OnAlertedChanged += AlertedChanged;
         Seeker.pathCallback += this.OnPathComplete;
     }
 
     private void OnDisable()
     {
-        this.GetComponentInChildren<EnemySight>().OnAlertedChanged -= AlertedChanged;
+        EnemySight.OnAlertedChanged -= AlertedChanged;
         Seeker.pathCallback -= null;
     }
+
+    private Coroutine FollowingPlayer = null;
 
     private void AlertedChanged(object source, bool alerted)
     {
         UnityEngine.Debug.Log("Alerted changed to: " + alerted.ToString());
+        if (alerted)
+        {
+            // start following the player
+            FollowingPlayer = StartCoroutine(FollowPlayer());
+        }
+        else
+        {
+            // stop following the player
+            if (FollowingPlayer != null)
+            {
+                StopCoroutine(FollowingPlayer);
+                FollowingPlayer = null;
+            }
+            // recompute where to start patrol
+            // TODO: run N pathfinding to the N patrol points, compute total path distances, get the shortest one
+            int minStepIndex = -1;
+            var minSqrDist = float.MaxValue;
+            for (var i = 0; i < Steps.Length; i++)
+            {
+                var step = Steps[i];
+                var sqrDist = (step.transform.position - transform.position).sqrMagnitude;
+                if (sqrDist < minSqrDist)
+                {
+                    minSqrDist = sqrDist;
+                    minStepIndex = i;
+                }
+            }
+            currentStepIndex = minStepIndex;
+            Path = null;
+            ComputingPath = true;
+            Seeker.StartPath(transform.position, Steps[currentStepIndex].transform.position);
+        }
+    }
+
+    private IEnumerator FollowPlayer()
+    {
+        while (EnemySight.Alerted)
+        {
+            Path = null;
+            ComputingPath = true;
+            Seeker.StartPath(transform.position, Player.transform.position);
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
     private Path Path = null;
@@ -49,7 +102,7 @@ public class EnemyMovement : MonoBehaviour
         }
         Path = p;
         ComputingPath = false;
-        currentWaypoint = 0;
+        currentWaypointIndex = 0;
     }
 
     // Update is called once per frame
@@ -57,11 +110,11 @@ public class EnemyMovement : MonoBehaviour
     {
         // compute start and end point of this patrolling area
         var startPosition = transform.position;
-        var patrollingEndPosition = Steps[currentStep].transform.position;
 
         // if we need to compute to path: run it
         if (Path == null && !ComputingPath)
         {
+            var patrollingEndPosition = Steps[currentStepIndex].transform.position;
             ComputingPath = true;
             Seeker.StartPath(startPosition, patrollingEndPosition);
         }
@@ -73,7 +126,7 @@ public class EnemyMovement : MonoBehaviour
         }
 
         // get the end position for this waypoint
-        var endPosition = Path.vectorPath[currentWaypoint];
+        var endPosition = Path.vectorPath[currentWaypointIndex];
 
         // move along the path
         var delta = Speed * Time.deltaTime;
@@ -83,11 +136,11 @@ public class EnemyMovement : MonoBehaviour
         // move to the next path part if completed it
         if (delta > totalDistance)
         {
-            currentWaypoint++;
-            if (currentWaypoint >= Path.vectorPath.Count)
+            currentWaypointIndex++;
+            if (currentWaypointIndex >= Path.vectorPath.Count)
             {
                 Path = null;
-                currentStep = (currentStep + 1) % Steps.Length;
+                currentStepIndex = (currentStepIndex + 1) % Steps.Length;
             }
         }
 
