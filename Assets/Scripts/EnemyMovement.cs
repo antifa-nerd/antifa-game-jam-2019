@@ -40,17 +40,17 @@ public class EnemyMovement : MonoBehaviour
         var totalDistance = (endPosition - startPosition).magnitude;
         transform.position = Vector3.Lerp(startPosition, endPosition, delta / totalDistance);
 
+        // move to the next path part if completed it
+        if (delta > totalDistance)
+        {
+            currentStep = (currentStep + 1) % Steps.Length;
+        }
+
         // rotate according to the direction
         var destUp = endPosition - transform.position;
         if (transform.up != destUp)
         {
             transform.up = Vector3.Lerp(transform.up, destUp, RotationSpeed / (destUp - transform.up).magnitude);
-        }
-
-        // move to the next path part if completed it
-        if (delta > totalDistance)
-        {
-            currentStep = (currentStep + 1) % Steps.Length;
         }
     }
 }
