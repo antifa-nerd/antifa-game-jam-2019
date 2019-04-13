@@ -38,7 +38,10 @@ public class EnemySight : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Exclamation.SetActive(false);
+        if (Exclamation != null)
+        {
+            Exclamation.SetActive(false);
+        }
     }
 
     // Update is called once per frame

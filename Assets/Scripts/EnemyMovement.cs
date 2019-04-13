@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -12,10 +13,13 @@ public class EnemyMovement : MonoBehaviour
 
     public float RotationSpeed = 1f;
 
+    private Seeker seeker;
+
     // Start is called before the first frame update
     void Start()
     {
         this.GetComponentInChildren<EnemySight>().OnAlertedChanged += AlertedChanged;
+        seeker = GetComponent<Seeker>();
     }
 
     private void OnDestroy()
