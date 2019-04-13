@@ -1,10 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySight : MonoBehaviour
 {
-    public bool Alerted = false;
+    public bool Alerted
+    {
+        get;
+        private set;
+    }
+
+    private void SetAlerted(bool value)
+    {
+        Alerted = value;
+        var ev = AlertedChanged;
+        if (ev != null)
+        {
+            ev(this, value);
+        }
+    }
 
     private Coroutine ResettingAlerted = null;
 
@@ -17,6 +32,8 @@ public class EnemySight : MonoBehaviour
     public float TriggerTime = 0.3f;
 
     public GameObject Exclamation;
+
+    public event EventHandler<bool> AlertedChanged;
 
     // Start is called before the first frame update
     void Start()
@@ -41,7 +58,7 @@ public class EnemySight : MonoBehaviour
     private IEnumerator GettingAlerted()
     {
         yield return new WaitForSeconds(TriggerTime);
-        Alerted = true;
+        SetAlerted(true);
         Exclamation.SetActive(true);
     }
 
@@ -61,7 +78,7 @@ public class EnemySight : MonoBehaviour
     private IEnumerator ResetAlerted()
     {
         yield return new WaitForSeconds(ResettingTime);
-        Alerted = false;
+        SetAlerted(false);
         Exclamation.SetActive(false);
         ResettingAlerted = null;
     }
