@@ -4,6 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using System;
 using System.Linq;
+using UnityEditor;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -103,6 +104,17 @@ public class EnemyMovement : MonoBehaviour
         Path = p;
         ComputingPath = false;
         currentWaypointIndex = 0;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+        for (var i = 0; i < Steps.Length; i++)
+        {
+            var pos1 = Steps[i].transform.position;
+            var pos2 = Steps[(i + 1) % Steps.Length].transform.position;
+            Gizmos.DrawLine(pos1, pos2);
+        }
     }
 
     // Update is called once per frame
