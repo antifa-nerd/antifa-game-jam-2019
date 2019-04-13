@@ -8,14 +8,19 @@ public class EnemySight : MonoBehaviour
 
     private Coroutine ResettingAlerted = null;
 
+    // number of seconds before the enemy stops being triggered.
     public float ResettingTime = 3;
+
+    private Coroutine TriggeringAlerted = null;
+
+    // number of seconds the enemy needs to get triggered.
+    public float TriggerTime = 0.3f;
 
     public GameObject Exclamation;
 
     // Start is called before the first frame update
     void Start()
     {
-        UnityEngine.Debug.Log("Start!");
         Exclamation.SetActive(false);
     }
 
@@ -29,15 +34,26 @@ public class EnemySight : MonoBehaviour
                 StopCoroutine(ResettingAlerted);
                 ResettingAlerted = null;
             }
-            Alerted = true;
-            Exclamation.SetActive(true);
+            TriggeringAlerted = StartCoroutine(GettingAlerted());
         }
+    }
+
+    private IEnumerator GettingAlerted()
+    {
+        yield return new WaitForSeconds(TriggerTime);
+        Alerted = true;
+        Exclamation.SetActive(true);
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.tag == "Player")
         {
+            if (TriggeringAlerted != null)
+            {
+                StopCoroutine(TriggeringAlerted);
+                TriggeringAlerted = null;
+            }
             ResettingAlerted = StartCoroutine(ResetAlerted());
         }
     }
