@@ -13,23 +13,36 @@ public class EnemyMovement : MonoBehaviour
 
     public float RotationSpeed = 1f;
 
-    private Seeker seeker;
+    private Seeker Seeker;
 
     // Start is called before the first frame update
     void Start()
     {
         this.GetComponentInChildren<EnemySight>().OnAlertedChanged += AlertedChanged;
-        seeker = GetComponent<Seeker>();
+        Seeker = GetComponent<Seeker>();
+        Seeker.pathCallback += this.OnPathComplete;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         this.GetComponentInChildren<EnemySight>().OnAlertedChanged -= AlertedChanged;
+        Seeker.pathCallback -= null;
     }
 
     private void AlertedChanged(object source, bool alerted)
     {
         UnityEngine.Debug.Log("Alerted changed to: " + alerted.ToString());
+    }
+
+    private Path Path = null;
+
+    private bool ComputingPath = false;
+
+    public void OnPathComplete(Path p)
+    {
+        Path = p;
+        ComputingPath = false;
+        Debug.Log("Yay, we got a path back. Did it have an error? " + p.error);
     }
 
     // Update is called once per frame
@@ -39,6 +52,12 @@ public class EnemyMovement : MonoBehaviour
         var startPosition = transform.position;
         var endPosition = Steps[currentStep].transform.position;
 
+        if (Path == null && !ComputingPath)
+        {
+            ComputingPath = true;
+            Seeker.StartPath(startPosition, endPosition);
+        }
+
         // move along the path
         var delta = Speed * Time.deltaTime;
         var totalDistance = (endPosition - startPosition).magnitude;
@@ -47,6 +66,7 @@ public class EnemyMovement : MonoBehaviour
         // move to the next path part if completed it
         if (delta > totalDistance)
         {
+            Path = null;
             currentStep = (currentStep + 1) % Steps.Length;
         }
 
