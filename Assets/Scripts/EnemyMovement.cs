@@ -16,7 +16,17 @@ public class EnemyMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        this.GetComponentInChildren<EnemySight>().OnAlertedChanged += AlertedChanged;
+    }
 
+    private void OnDestroy()
+    {
+        this.GetComponentInChildren<EnemySight>().OnAlertedChanged -= AlertedChanged;
+    }
+
+    private void AlertedChanged(object source, bool alerted)
+    {
+        UnityEngine.Debug.Log("Alerted changed to: " + alerted.ToString());
     }
 
     // Update is called once per frame

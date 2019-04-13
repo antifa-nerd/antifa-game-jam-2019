@@ -14,7 +14,7 @@ public class EnemySight : MonoBehaviour
     private void SetAlerted(bool value)
     {
         Alerted = value;
-        var ev = AlertedChanged;
+        var ev = OnAlertedChanged;
         if (ev != null)
         {
             ev(this, value);
@@ -33,7 +33,7 @@ public class EnemySight : MonoBehaviour
 
     public GameObject Exclamation;
 
-    public event EventHandler<bool> AlertedChanged;
+    public event EventHandler<bool> OnAlertedChanged;
 
     // Start is called before the first frame update
     void Start()
