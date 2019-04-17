@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 30e677189fa422e4eac1d45cc076420c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -211,7 +211,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 0.009313857, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -360,9 +360,9 @@ MonoBehaviour:
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 256
-  meshResolution: 0
-  edgeResolveIterations: 0
-  edgeDstThreshold: 0
+  meshResolution: 1
+  edgeResolveIterations: 6
+  edgeDstThreshold: 0.5
   viewMeshFilter: {fileID: 5900235206309701610}
   VisibleTarget: {fileID: 0}
 --- !u!58 &398104916

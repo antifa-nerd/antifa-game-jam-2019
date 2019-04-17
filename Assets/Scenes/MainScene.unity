@@ -1037,7 +1037,17 @@ PrefabInstance:
     - target: {fileID: 4472304646977574588, guid: 6e844ff957a090e4382715f567ecc55e,
         type: 3}
       propertyPath: meshResolution
-      value: 0.12
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4472304646977574588, guid: 6e844ff957a090e4382715f567ecc55e,
+        type: 3}
+      propertyPath: ViewRadius
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4472304646977574588, guid: 6e844ff957a090e4382715f567ecc55e,
+        type: 3}
+      propertyPath: ViewAngle
+      value: 80
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e844ff957a090e4382715f567ecc55e, type: 3}

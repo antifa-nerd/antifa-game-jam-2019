@@ -99,7 +99,7 @@ public class EnemyFieldOfView : MonoBehaviour
         return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), Mathf.Cos(angleInDegrees * Mathf.Deg2Rad), 0);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         DrawFieldOfView();
     }
@@ -109,30 +109,32 @@ public class EnemyFieldOfView : MonoBehaviour
         int stepCount = Mathf.RoundToInt(ViewAngle * meshResolution);
         float stepAngleSize = ViewAngle / stepCount;
         List<Vector3> viewPoints = new List<Vector3>();
-        // ViewCastInfo oldViewCast = new ViewCastInfo ();
+        ViewCastInfo oldViewCast = new ViewCastInfo();
         for (int i = 0; i <= stepCount; i++)
         {
             float angle = -transform.eulerAngles.z - ViewAngle / 2 + stepAngleSize * i;
             ViewCastInfo newViewCast = ViewCast(angle);
 
-            // if (i > 0) {
-            // 	bool edgeDstThresholdExceeded = Mathf.Abs (oldViewCast.dst - newViewCast.dst) > edgeDstThreshold;
-            // 	if (oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && edgeDstThresholdExceeded)) {
-            // 		EdgeInfo edge = FindEdge (oldViewCast, newViewCast);
-            // 		if (edge.pointA != Vector3.zero) {
-            // 			viewPoints.Add (edge.pointA);
-            // 		}
-            // 		if (edge.pointB != Vector3.zero) {
-            // 			viewPoints.Add (edge.pointB);
-            // 		}
-            // 	}
-
-            // }
-
+            if (i > 0)
+            {
+                bool edgeDstThresholdExceeded = Mathf.Abs(oldViewCast.dst - newViewCast.dst) > edgeDstThreshold;
+                if (oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && edgeDstThresholdExceeded))
+                {
+                    EdgeInfo edge = FindEdge(oldViewCast, newViewCast);
+                    if (edge.pointA != Vector3.zero)
+                    {
+                        viewPoints.Add(edge.pointA);
+                    }
+                    if (edge.pointB != Vector3.zero)
+                    {
+                        viewPoints.Add(edge.pointB);
+                    }
+                }
+            }
 
             viewPoints.Add(newViewCast.point);
             Debug.DrawLine(transform.position, newViewCast.point, Color.red);
-            // oldViewCast = newViewCast;
+            oldViewCast = newViewCast;
         }
 
         int vertexCount = viewPoints.Count + 1;
@@ -189,6 +191,34 @@ public class EnemyFieldOfView : MonoBehaviour
             dst = _dst;
             angle = _angle;
         }
+    }
+
+    EdgeInfo FindEdge(ViewCastInfo minViewCast, ViewCastInfo maxViewCast)
+    {
+        float minAngle = minViewCast.angle;
+        float maxAngle = maxViewCast.angle;
+        Vector3 minPoint = Vector3.zero;
+        Vector3 maxPoint = Vector3.zero;
+
+        for (int i = 0; i < edgeResolveIterations; i++)
+        {
+            float angle = (minAngle + maxAngle) / 2;
+            ViewCastInfo newViewCast = ViewCast(angle);
+
+            bool edgeDstThresholdExceeded = Mathf.Abs(minViewCast.dst - newViewCast.dst) > edgeDstThreshold;
+            if (newViewCast.hit == minViewCast.hit && !edgeDstThresholdExceeded)
+            {
+                minAngle = angle;
+                minPoint = newViewCast.point;
+            }
+            else
+            {
+                maxAngle = angle;
+                maxPoint = newViewCast.point;
+            }
+        }
+
+        return new EdgeInfo(minPoint, maxPoint);
     }
 
     public struct EdgeInfo
