@@ -35,6 +35,8 @@ public class EnemySight : MonoBehaviour
 
     public event EventHandler<bool> OnAlertedChanged;
 
+    private EnemyFieldOfView EnemyFieldOfView;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,20 +44,26 @@ public class EnemySight : MonoBehaviour
         {
             Exclamation.SetActive(false);
         }
+        EnemyFieldOfView = GetComponent<EnemyFieldOfView>();
+        EnemyFieldOfView.OnPlayerEnter += OnPlayerEnter;
+        EnemyFieldOfView.OnPlayerExit += OnPlayerExit;
+    }
+
+    private void OnDisable()
+    {
+        EnemyFieldOfView.OnPlayerEnter -= OnPlayerEnter;
+        EnemyFieldOfView.OnPlayerExit -= OnPlayerExit;
     }
 
     // Update is called once per frame
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnPlayerEnter(object source, EventArgs args)
     {
-        if (other.gameObject.tag == "Player")
+        if (ResettingAlerted != null)
         {
-            if (ResettingAlerted != null)
-            {
-                StopCoroutine(ResettingAlerted);
-                ResettingAlerted = null;
-            }
-            TriggeringAlerted = StartCoroutine(GettingAlerted());
+            StopCoroutine(ResettingAlerted);
+            ResettingAlerted = null;
         }
+        TriggeringAlerted = StartCoroutine(GettingAlerted());
     }
 
     private IEnumerator GettingAlerted()
@@ -65,17 +73,14 @@ public class EnemySight : MonoBehaviour
         Exclamation.SetActive(true);
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnPlayerExit(object source, EventArgs args)
     {
-        if (other.gameObject.tag == "Player")
+        if (TriggeringAlerted != null)
         {
-            if (TriggeringAlerted != null)
-            {
-                StopCoroutine(TriggeringAlerted);
-                TriggeringAlerted = null;
-            }
-            ResettingAlerted = StartCoroutine(ResetAlerted());
+            StopCoroutine(TriggeringAlerted);
+            TriggeringAlerted = null;
         }
+        ResettingAlerted = StartCoroutine(ResetAlerted());
     }
 
     private IEnumerator ResetAlerted()
