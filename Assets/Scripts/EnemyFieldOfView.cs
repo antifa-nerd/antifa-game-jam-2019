@@ -46,8 +46,8 @@ public class EnemyFieldOfView : MonoBehaviour
         var hadPreviousTarget = VisibleTarget != null;
         VisibleTarget = null;
         var pos = (Vector2)transform.position;
-        // memory inefficient
-        var collider = Physics2D.OverlapCircle(
+        // check if the player is inside our circle of view
+        var collider = Physics2D.OverlapCircle( // TODO: memory inefficient
             pos,
             ViewRadius,
             TargetMask
@@ -55,16 +55,23 @@ public class EnemyFieldOfView : MonoBehaviour
 
         if (collider != null)
         {
+            // check if the player is inside our cone of view
             Transform target = collider.transform;
             var targetPos = (Vector2)target.position;
             var dirToTarget = (targetPos - pos).normalized;
             if (Vector2.Angle(transform.up, dirToTarget) < ViewAngle / 2)
             {
+                // check if the player is in our line of sight
                 float dstToTarget = Vector2.Distance(pos, targetPos);
 
                 if (!Physics2D.Raycast(pos, dirToTarget, dstToTarget, ObstacleMask))
                 {
-                    VisibleTarget = target;
+                    // check if the player is not hidden
+                    if (!target.gameObject.GetComponent<Hide>().Hidden)
+                    {
+                        // ok: we see it
+                        VisibleTarget = target;
+                    }
                 }
             }
         }
