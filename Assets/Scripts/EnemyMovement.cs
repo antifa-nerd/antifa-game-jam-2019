@@ -108,12 +108,18 @@ public class EnemyMovement : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.blue;
-        for (var i = 0; i < Steps.Length; i++)
+        if ( Steps != null )
         {
-            var pos1 = Steps[i].transform.position;
-            var pos2 = Steps[(i + 1) % Steps.Length].transform.position;
-            Gizmos.DrawLine(pos1, pos2);
+            Gizmos.color = Color.blue;
+            for ( var i = 0; i < Steps.Length; i++ )
+            {
+                if ( Steps[i] != null )
+                {
+                    var pos1 = Steps[i].transform.position;
+                    var pos2 = Steps[( i + 1 ) % Steps.Length].transform.position;
+                    Gizmos.DrawLine( pos1, pos2 );
+                }
+            }
         }
     }
 
