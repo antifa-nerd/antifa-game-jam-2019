@@ -32,6 +32,7 @@ public class EnemySight : MonoBehaviour
     public float TriggerTime = 0.3f;
 
     public GameObject Exclamation;
+    [SerializeField] private float ExclamationOffset = 0.5f;
 
     public event EventHandler<bool> OnAlertedChanged;
 
@@ -53,6 +54,11 @@ public class EnemySight : MonoBehaviour
     {
         EnemyFieldOfView.OnPlayerEnter -= OnPlayerEnter;
         EnemyFieldOfView.OnPlayerExit -= OnPlayerExit;
+    }
+
+    private void LateUpdate()
+    {
+        Exclamation.transform.position = new Vector2( this.transform.position.x + ExclamationOffset, this.transform.position.y + ExclamationOffset );
     }
 
     // Update is called once per frame
